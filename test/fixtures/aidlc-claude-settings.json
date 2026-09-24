@@ -1,0 +1,168 @@
+{
+  "_source": "awslabs/aidlc-workflows v2.9.0 runtime/claude/.claude/settings.json (hooks only, MIT-0)",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook fold-usage"
+          }
+        ]
+      },
+      {
+        "matcher": "Task|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook deliver-stage-rules"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|NotebookRead|Edit|MultiEdit|Write|NotebookEdit|LS|Glob|Grep|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook state-transition-guard"
+          },
+          {
+            "type": "command",
+            "command": "aidlc engine hook reviewer-scope"
+          },
+          {
+            "type": "command",
+            "command": "aidlc engine hook review-freeze"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|MultiEdit|Write|NotebookEdit|Bash|Task|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook plan-approval-guard"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook record-human-turn"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook session-start"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook session-end"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook write-audit-log"
+          },
+          {
+            "type": "command",
+            "command": "aidlc engine hook run-sensors"
+          }
+        ]
+      },
+      {
+        "matcher": "TaskUpdate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook sync-workflow-state"
+          }
+        ]
+      },
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook record-human-turn"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook rebuild-stage-graph"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook fold-usage"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook validate-state"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook log-subagent"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "aidlc engine hook continue-workflow"
+          }
+        ]
+      }
+    ]
+  }
+}

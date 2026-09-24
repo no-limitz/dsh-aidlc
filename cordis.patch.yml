@@ -1,0 +1,125 @@
+# dsh-aidlc bundle layer.
+#
+# Two rows:
+#   1. `aidlc-hooks` (host plane) runs the AI-DLC engine hooks declared in a
+#      workspace's `.claude/settings.json` for every session in a workspace where
+#      AI-DLC is installed — the same "project hooks always apply" rule Claude
+#      Code follows. Workspaces without AI-DLC are untouched.
+#   2. The "AI-DLC" agent preset for the Web surface: the standard preset plus
+#      the `dsh-aidlc` row (AI-DLC skills, the `aidlc_agent` dispatch tool, and
+#      the Claude-vocabulary prompt note). dsh 0.1.7+ declares it with the
+#      `preset-aidlc` row below; dsh 0.1.5 reads `presets/aidlc/` from this
+#      package, added to its roster by the `aidlc-preset-root` row. Each row
+#      disables itself on the other version.
+#
+# Per-tier model routing: override the `aidlc` row's `tiers` in your profile's
+# cordis.patch.yml (a patch replaces the whole row config, so restate it all).
+- insert:
+    - id: aidlc-hooks
+      name: 'dsh-aidlc/hooks'
+      config:
+        harnessDir: .claude
+
+    - id: aidlc-preset-root
+      name: 'dsh-aidlc/preset-root'
+      disabled: !!js "![...loader.entries()].some(entry => String(entry.id).endsWith(':agent-presets'))"
+
+    - id: preset-aidlc
+      name: '@deepseek-ai/dsh-agent-preset'
+      disabled: !!js "![...loader.entries()].some(entry => String(entry.id).endsWith(':agent-preset-registry'))"
+      config:
+        id: aidlc
+        name: AI-DLC
+        description: AWS AI-Driven Development Life Cycle — run /aidlc to start or resume a workflow.
+        order: 2
+        plugins:
+          - id: persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              suffix: Your working directory is {{cwd}}.
+              prefix: >-
+                You are a coding agent powered by the {{model}} model, acting as the AI-DLC
+                conductor: you drive AWS AI-DLC workflows through the aidlc engine and delegate
+                stage work to AI-DLC agents with the aidlc_agent tool.
+          - id: agent-instructions
+            name: '@deepseek-ai/dsh-agent-instructions'
+            config:
+              maxBytes: 65536
+          - id: tool-bash
+            name: '@deepseek-ai/dsh-tool-bash'
+            disabled: !!js process.platform === 'win32'
+          - id: tool-pwsh
+            name: '@deepseek-ai/dsh-tool-pwsh'
+            disabled: !!js process.platform !== 'win32'
+          - id: tool-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+          - id: tool-fs-search
+            name: '@deepseek-ai/dsh-tool-fs-search'
+            config:
+              sampleOverCapGlobResults: false
+          - id: tool-jobs
+            name: '@deepseek-ai/dsh-tool-jobs'
+          - id: skill-filesystem
+            name: '@deepseek-ai/dsh-skill-filesystem'
+          - id: tool-skill
+            name: '@deepseek-ai/dsh-tool-skill'
+          - id: aidlc
+            name: 'dsh-aidlc'
+            config:
+              harnessDir: .claude
+              provider: spawn
+              toolName: aidlc_agent
+              # Child LLM route per AI-DLC tier; omitted fields inherit the
+              # conductor's route. Example:
+              #   judgment:  { model: deepseek-v4-pro, reasoningEffort: high }
+              #   balanced:  { model: deepseek-v4-pro }
+              #   templated: { model: deepseek-v4-flash }
+              tiers: {}
+          - id: compaction
+            name: cordis:group
+            group: true
+            isolate:
+              compaction: true
+              toolResultPruner: true
+            config:
+              - id: compaction-basic
+                name: '@deepseek-ai/dsh-compaction-basic'
+              - id: command-compact
+                name: '@deepseek-ai/dsh-command-compact'
+              - id: tool-result-pruner
+                name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+                config:
+                  # The AI-DLC orchestrator skill is ~60 KB; keep it whole.
+                  thresholdChars: 65536
+                  headChars: 4096
+                  tailChars: 1024
+          - id: delegation
+            name: cordis:group
+            group: true
+            isolate:
+              workflowEngine: true
+            config:
+              - id: tool-subagent-control
+                name: '@deepseek-ai/dsh-tool-subagent-control'
+              - id: tool-subagent-list-agents
+                name: '@deepseek-ai/dsh-tool-subagent-control/list-agents'
+              - id: tool-subagent
+                name: '@deepseek-ai/dsh-tool-subagent'
+                config:
+                  provider: spawn
+                  toolName: subagent
+                  modelSelectionSettings: true
+                  backgroundMode: continuable
+          - id: tool-ask-user
+            name: '@deepseek-ai/dsh-tool-ask-user'
+          - id: tool-todo
+            name: '@deepseek-ai/dsh-tool-todo'
+            config:
+              allowParallelInProgress: true
+          - id: tool-web
+            name: '@deepseek-ai/dsh-tool-web'
+            config:
+              fetch: true
+              searchTimeoutMs: 60000
+          - id: present
+            name: '@deepseek-ai/dsh-tool-present'
