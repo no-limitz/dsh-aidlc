@@ -23,6 +23,9 @@ DeepSeek Harness adapter yet, so this bundle runs AI-DLC's **Claude Code project
   one is running and mounts the matching preset.
 - The AI-DLC native binary (`aidlc` ≥ 2.9.0), installed from the
   [AI-DLC Quick Start](https://github.com/awslabs/aidlc-workflows#quick-start).
+  Bun is **not** required. You only need it if you install AI-DLC's "copy runtime" instead
+  of the native binary; there the hooks run as `bun .claude/tools/aidlc.ts …`, so `bun` must
+  be on `PATH` or in `extraPath`.
 - An AI-DLC project set up for the Claude harness:
 
   ```sh
