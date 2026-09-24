@@ -5,6 +5,11 @@ A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) bundle tha
 its 14 agents, its `/aidlc` workflow skills, and its engine hooks (approval gates, state
 guards, audit log, sensors).
 
+> **Unofficial.** dsh-aidlc is a community project. It is not affiliated with, endorsed by,
+> or supported by DeepSeek or Amazon Web Services. "DeepSeek Harness" is a trademark of
+> DeepSeek, and "AWS" is a trademark of Amazon.com, Inc. or its affiliates; both are used
+> here only to describe compatibility. See `THIRD_PARTY_NOTICES.md` for licenses.
+
 AI-DLC ships one harness-neutral core plus a thin adapter per coding agent. It has no
 DeepSeek Harness adapter yet, so this bundle runs AI-DLC's **Claude Code projection**
 (`aidlc config --harness claude`) inside Harness and translates at the edges.
