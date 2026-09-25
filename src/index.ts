@@ -20,6 +20,7 @@ import type {} from '@deepseek-ai/dsh-system-prompt'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { findAidlcProject, loadAgents, loadSkills, type AidlcSkill } from './project.ts'
 import { childAgents, takePromptRewrite } from './registry.ts'
+import { readModelsFile, withModelsFile } from './models.ts'
 import { routeFor, type RouteConfig, type RouteOptions } from './route.ts'
 import { adaptationNote, blocksToText, DEFAULT_DISPATCH_TOOL, defangTemplate, TIERS, type Tier } from './translate.ts'
 
@@ -186,7 +187,8 @@ export function apply(ctx: Context, config: Config): void {
       }
       // The AI-DLC deliver-stage-rules PreToolUse hook may have rewritten the brief.
       const prompt = takePromptRewrite(exec.callId) ?? args.prompt
-      const route = routeFor(config, agent.name)
+      // $DSH_HOME/aidlc-models.json (dsh-aidlc-models) layers over the row config per dispatch.
+      const route = routeFor(withModelsFile(config, readModelsFile(undefined, message => ctx.logger.warn(message))), agent.name)
       // resolveMaxDepth() arrived after dsh 0.1.5; older hosts take the configured cap as-is.
       const maxDepth = typeof ctx.subagents.resolveMaxDepth === 'function'
         ? ctx.subagents.resolveMaxDepth(config.maxDepth)

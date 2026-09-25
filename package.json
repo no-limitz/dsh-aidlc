@@ -1,6 +1,6 @@
 {
   "name": "dsh-aidlc",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "DeepSeek Harness bundle that loads AWS AI-DLC (AI-Driven Development Life Cycle) agents, skills, and hooks",
   "type": "module",
   "license": "MIT",
@@ -20,6 +20,10 @@
     "./preset-root": {
       "types": "./lib/preset-root.d.ts",
       "default": "./lib/preset-root.js"
+    },
+    "./models": {
+      "types": "./lib/models.d.ts",
+      "default": "./lib/models.js"
     }
   },
   "files": [
@@ -82,5 +86,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/no-limitz/dsh-aidlc.git"
+  },
+  "bin": {
+    "dsh-aidlc-models": "lib/models-cli.js"
   }
 }

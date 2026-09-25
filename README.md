@@ -131,6 +131,26 @@ tier to its own model. Any field you leave out is inherited from the conductor's
             my-custom-agent: templated     # tier for agents you add yourself
 ```
 
+### Per-agent models: `dsh-aidlc-models`
+
+A route set in a preset row can't be changed without restating the whole preset. So the
+bundle also reads a user-level routes file, **`$DSH_HOME/aidlc-models.json`**, which takes
+precedence over the row's `tiers` / `agentRoutes`. The file is re-read on every
+`aidlc_agent` dispatch, so edits apply to the next agent with no restart. The bundled CLI
+edits it:
+
+```sh
+dsh-aidlc-models show                                   # tiers, agents, what each resolves to
+dsh-aidlc-models set --tier judgment --model deepseek-v4-pro
+dsh-aidlc-models set --agent aidlc-developer-agent --model deepseek-v4-pro --effort high
+dsh-aidlc-models unset --agent aidlc-developer-agent
+dsh-aidlc-models reset
+```
+
+An agent route takes precedence over its tier's route, and any field left unset inherits from
+the conductor's session (including the provider). The model must be one that the session's
+provider serves. `DSH_AIDLC_MODELS_FILE` points the plugin and the CLI at a different file.
+
 | `dsh-aidlc` field | Default | Meaning |
 |---|---|---|
 | `harnessDir` | `.claude` | AI-DLC projection directory in the project |
@@ -167,6 +187,7 @@ Source layout:
 | `src/project.ts` | Discovers the AI-DLC install: agents, skills, hook config (cached by mtime) |
 | `src/translate.ts` | Tool-name map, agent tier table, prompt note |
 | `src/route.ts` | Tier and per-agent model routing |
+| `src/models.ts`, `src/models-cli.ts` | The `aidlc-models.json` routes layer and the `dsh-aidlc-models` CLI |
 | `src/registry.ts` | State shared between the two rows: child agent identity, parked prompt rewrites |
 | `src/shell.ts` | Hook runner that works with both shell-executor APIs (0.1.5 `run`, 0.1.7 `execute`) |
 | `src/preset-root.ts` | dsh 0.1.5: adds `presets/` to the preset roster |
